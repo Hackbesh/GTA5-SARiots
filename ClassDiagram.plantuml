@@ -1,0 +1,77 @@
+@startuml SanAndreasRiotsClassDiagram
+
+namespace SanAndreasRiots {    
+
+    abstract class ScriptProducer {
+        - scripts : LinkedList<Script>
+        # Count : int
+        # Add(script : Script) : void
+        # Clear() : void
+    }
+    note left : スクリプトの生成・管理
+
+    abstract class Script {
+        + IsActive : bool
+        + OnPreUpdate : UniRx.IObservable<Unit>
+        + OnUpdate : UniRx.IObservable<Unit>
+        + Scheduler : IScheduler
+        + Disposable : CompositeDisposable
+        + Setup() : void
+        + PreUpdate() : void
+        + Update() : void
+        + End() : void
+    }
+    note bottom: 各スクリプトの実装
+
+    class CitizenScriptProducer {
+
+    }
+    note bottom : 市民用スクリプト
+
+    class PoliceScriptProducer {
+
+    }
+    note bottom : 警察用スクリプト
+
+    class WorldScriptProducer {
+
+    }
+    note bottom : 地形用スクリプト
+
+    class MiscScriptProducer {
+        
+    }
+    note bottom : その他スクリプト
+
+    class Core {
+        + {static} Instance : Core
+    }
+    note right : スケジューラやコルーチンの実行
+
+}
+
+namespace GTA.Extensions {
+
+    abstract class ScriptEx {
+        + PreUpdate : EventHandler
+        + Update : EventHandler
+        + PreUpdateAsObservable : UniRx.IObservable<Unit>
+        + UpdateAsObservable : UniRx.IObservable<Unit>
+        + KeyUpAsObservable : UniRx.IObservable<KeyEventArgs>
+        + Scheduler : IScheduler
+        + Coroutine : CoroutineSystem
+        + CompositeDisposable : CompositeDisposable
+    }
+
+}
+
+GTA.Extensions.ScriptEx <|-- SanAndreasRiots.Core
+GTA.Extensions.ScriptEx <|-- SanAndreasRiots.ScriptProducer
+SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.CitizenScriptProducer
+SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.PoliceScriptProducer
+SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.WorldScriptProducer
+SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.MiscScriptProducer
+SanAndreasRiots.ScriptProducer o.. SanAndreasRiots.Script
+SanAndreasRiots.Script <-- SanAndreasRiots.Core
+
+@enduml
