@@ -5,12 +5,14 @@ namespace SanAndreasRiots {
     abstract class ScriptProducer {
         - scripts : LinkedList<Script>
         # Count : int
-        # Add(script : Script) : void
+        # Add(script : Script) : LinkedListNode<Script>
+        # Remove(scriptNode : LinkedListNode<Script>) : void
         # Clear() : void
     }
     note left : スクリプトの生成・管理
 
     abstract class Script {
+        + Cancellation : IDisposable
         + IsActive : bool
         + OnPreUpdate : UniRx.IObservable<Unit>
         + OnUpdate : UniRx.IObservable<Unit>
@@ -19,9 +21,9 @@ namespace SanAndreasRiots {
         + Setup() : void
         + PreUpdate() : void
         + Update() : void
-        + End() : void
+        + Dispose() : void
     }
-    note bottom: 各スクリプトの実装
+    note top: 各スクリプトの実装
 
     class CitizenScriptProducer {
 
@@ -43,8 +45,8 @@ namespace SanAndreasRiots {
     }
     note bottom : その他スクリプト
 
-    class Core {
-        + {static} Instance : Core
+    class ScriptDispatcher {
+        + {static} Instance : ScriptDispatcher
     }
     note right : スケジューラやコルーチンの実行
 
@@ -65,13 +67,13 @@ namespace GTA.Extensions {
 
 }
 
-GTA.Extensions.ScriptEx <|-- SanAndreasRiots.Core
+GTA.Extensions.ScriptEx <|-- SanAndreasRiots.ScriptDispatcher
 GTA.Extensions.ScriptEx <|-- SanAndreasRiots.ScriptProducer
 SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.CitizenScriptProducer
 SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.PoliceScriptProducer
 SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.WorldScriptProducer
 SanAndreasRiots.ScriptProducer <|-- SanAndreasRiots.MiscScriptProducer
 SanAndreasRiots.ScriptProducer o.. SanAndreasRiots.Script
-SanAndreasRiots.Script <-- SanAndreasRiots.Core
+SanAndreasRiots.Script <-- SanAndreasRiots.ScriptDispatcher
 
 @enduml
